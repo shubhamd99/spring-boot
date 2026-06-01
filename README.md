@@ -10,7 +10,7 @@ With Spring Boot, you can quickly create standalone web applications, REST APIs,
 
 IoC stands for Inversion of Control. It means the framework controls how objects are created, connected, and managed instead of the developer manually creating every object with `new`.
 
-DI stands for Dependency Injection. It is a way to provide an object with the other objects it needs. In Spring, dependencies are usually injected through constructors, fields, or setter methods.
+DI stands for Dependency Injection. It is a way to provide an object with the other objects it needs. In Spring, dependencies are usually injected through constructors, setter methods, or fields. Constructor injection is usually preferred because it makes required dependencies clear and helps with testing.
 
 For example, instead of a service class creating its own repository object, Spring can create the repository and inject it into the service. This makes code easier to test, reuse, and maintain.
 
@@ -23,7 +23,7 @@ It was created to make Spring application development faster and simpler by redu
 ## Key Features
 
 - Auto-configuration for common application setup
-- Embedded servers such as Tomcat, Jetty, or Undertow
+- Embedded web servers such as Tomcat or Jetty for servlet applications, and Reactor Netty for reactive applications
 - Starter dependencies for web, data, security, testing, and more
 - Production-ready tools like health checks, metrics, and externalized configuration
 - Simple application startup using a standard `main` method
@@ -85,44 +85,52 @@ Client -> Controller -> Service -> Repository -> Database
 
 ## gRPC in Spring Boot
 
-gRPC is a high-performance communication framework used to connect services. Instead of using JSON like most REST APIs, gRPC usually uses Protocol Buffers, also called protobuf, to define request and response messages.
+gRPC is a high-performance communication framework used for service-to-service communication. It usually uses Protocol Buffers, also called protobuf, instead of JSON.
 
-Spring Boot can be used with gRPC to build fast service-to-service communication, especially in microservices systems.
+In Spring Boot, gRPC is useful for fast internal APIs, strongly typed contracts, and streaming. REST is usually easier for beginners and better for public APIs.
 
-REST is usually easier for beginners and is commonly used for public APIs. gRPC is useful when services need faster communication, strongly typed contracts, streaming, or efficient internal communication.
-
-Important gRPC topics to learn:
-
-- Protocol Buffers and `.proto` files
-- gRPC services and methods
-- Unary calls
-- Server streaming
-- Client streaming
-- Bidirectional streaming
-- gRPC clients and servers in Spring Boot
-- Error handling and status codes
-- Authentication and security
-- Testing gRPC APIs
+Learn the basics of `.proto` files, gRPC services, unary calls, streaming, clients, servers, error handling, security, and testing.
 
 ## GraphQL in Spring Boot
 
 GraphQL is an API query language that lets clients ask for exactly the data they need. Unlike REST, where different endpoints often return fixed response structures, GraphQL usually uses a single endpoint and a schema that defines available data and operations.
 
-Spring Boot can be used with GraphQL to build flexible APIs for web and mobile applications. It is useful when clients need different shapes of data, when REST responses become too large, or when multiple related resources need to be fetched together.
+Spring Boot can be used with GraphQL to build flexible APIs for web and mobile applications. Learn schemas, queries, mutations, subscriptions, resolvers, input types, Spring for GraphQL, validation, security, and testing.
 
-Important GraphQL topics to learn:
+## Running Spring Boot Applications
 
-- GraphQL schema
-- Queries
-- Mutations
-- Subscriptions
-- Resolvers
-- Input types
-- Object types
-- Spring for GraphQL
-- Validation and error handling
-- Security and authorization
-- Testing GraphQL APIs
+Spring Boot applications can run locally during development and in production after being packaged.
+
+### Local Development
+
+During development, you usually run the application from the IDE or terminal:
+
+```bash
+mvn spring-boot:run
+```
+
+You can also build and run the JAR:
+
+```bash
+mvn clean package
+java -jar target/app-name.jar
+```
+
+By default, a Spring Boot web application starts at `http://localhost:8080`.
+
+### Production
+
+In production, the application is usually packaged as a JAR and run on a server, Docker container, or cloud platform:
+
+```bash
+java -jar app-name.jar
+```
+
+Production apps should use environment variables, proper logging, security, monitoring, health checks, and profiles such as `dev`, `test`, and `prod`.
+
+### Embedded Tomcat vs External Tomcat
+
+Spring Boot web applications usually include an embedded web server through the web starter dependency. For servlet web applications, this is usually embedded Tomcat, so you usually do not need to install Tomcat separately. Spring Boot can also support WAR deployment to an external Tomcat server, but standalone JAR deployment is simpler and more common.
 
 ## Why Use Spring Boot?
 
@@ -136,6 +144,8 @@ To learn Spring Boot properly, focus on these topics:
 - Maven project structure and `pom.xml`
 - Spring core concepts: IoC, DI, beans, and application context
 - Spring Boot project structure
+- `@SpringBootApplication`
+- Beans and components: `@Component`, `@Service`, `@Repository`, and `@Controller`
 - REST API development
 - Controllers, services, repositories, entities, and DTOs
 - HTTP methods: GET, POST, PUT, DELETE
@@ -145,9 +155,15 @@ To learn Spring Boot properly, focus on these topics:
 - Database integration with Spring Data JPA
 - MySQL or PostgreSQL basics
 - Configuration using `application.properties` or `application.yml`
+- Profiles such as `dev`, `test`, and `prod`
+- Spring Boot Actuator for health checks and metrics
+- Database migrations using Flyway or Liquibase
+- API documentation using OpenAPI or Swagger
+- Logging basics
 - Testing with JUnit and Mockito
 - Spring Security basics
 - Building and running the application with Maven
+- Docker basics for packaging and deployment
 - API testing using Postman or curl
 - gRPC basics for service-to-service communication
 - GraphQL basics for flexible API queries

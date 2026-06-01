@@ -83,6 +83,47 @@ DTO stands for Data Transfer Object. It is used to send only the required data b
 Client -> Controller -> Service -> Repository -> Database
 ```
 
+## gRPC in Spring Boot
+
+gRPC is a high-performance communication framework used to connect services. Instead of using JSON like most REST APIs, gRPC usually uses Protocol Buffers, also called protobuf, to define request and response messages.
+
+Spring Boot can be used with gRPC to build fast service-to-service communication, especially in microservices systems.
+
+REST is usually easier for beginners and is commonly used for public APIs. gRPC is useful when services need faster communication, strongly typed contracts, streaming, or efficient internal communication.
+
+Important gRPC topics to learn:
+
+- Protocol Buffers and `.proto` files
+- gRPC services and methods
+- Unary calls
+- Server streaming
+- Client streaming
+- Bidirectional streaming
+- gRPC clients and servers in Spring Boot
+- Error handling and status codes
+- Authentication and security
+- Testing gRPC APIs
+
+## GraphQL in Spring Boot
+
+GraphQL is an API query language that lets clients ask for exactly the data they need. Unlike REST, where different endpoints often return fixed response structures, GraphQL usually uses a single endpoint and a schema that defines available data and operations.
+
+Spring Boot can be used with GraphQL to build flexible APIs for web and mobile applications. It is useful when clients need different shapes of data, when REST responses become too large, or when multiple related resources need to be fetched together.
+
+Important GraphQL topics to learn:
+
+- GraphQL schema
+- Queries
+- Mutations
+- Subscriptions
+- Resolvers
+- Input types
+- Object types
+- Spring for GraphQL
+- Validation and error handling
+- Security and authorization
+- Testing GraphQL APIs
+
 ## Why Use Spring Boot?
 
 Spring Boot helps developers focus on business logic instead of boilerplate setup. It is widely used for building scalable Java applications and is a popular choice for REST APIs, enterprise services, and cloud-native applications.
@@ -108,6 +149,8 @@ To learn Spring Boot properly, focus on these topics:
 - Spring Security basics
 - Building and running the application with Maven
 - API testing using Postman or curl
+- gRPC basics for service-to-service communication
+- GraphQL basics for flexible API queries
 
 ## Maven vs Gradle
 

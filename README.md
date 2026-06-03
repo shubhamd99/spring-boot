@@ -10,7 +10,9 @@ With Spring Boot, you can quickly create standalone web applications, REST APIs,
 
 - **IoC (Inversion of Control)**: A design principle where the control of object creation and lifecycle management is transferred from the developer to the framework. Instead of manually instantiating classes with the `new` operator, the framework takes care of creating and managing them.
 - **DI (Dependency Injection)**: A pattern used to implement IoC. It is the process of supplying a resource (dependency) that a class needs. In Spring, dependencies are typically injected using Constructor Injection, Setter Injection, or Field Injection. Constructor injection is recommended because it ensures required dependencies are not null and supports immutability.
-- **IoC Container**: The core component of the Spring framework that implements IoC. It is responsible for instantiating, configuring, and assembling application objects (referred to as **Beans**) by reading configuration metadata (via Java annotations, code, or XML). In Spring Boot, the container is represented by the `ApplicationContext` interface.
+- **IoC Container**: The core component of the Spring framework that implements IoC. It is responsible for instantiating, configuring, and assembling application objects (referred to as **Beans**) by reading configuration metadata. It is represented by two main interfaces:
+  - **BeanFactory**: The basic container that provides configuration management and lazy-loading of beans (instantiates them only when requested).
+  - **Spring Context (ApplicationContext)**: The advanced container built on top of `BeanFactory`. It adds enterprise features such as event publishing, internationalization, and eager-loading of beans (instantiates singletons on startup).
 
 For example, if you manually create an object using the `new` keyword (e.g., `MyService service = new MyService()`), that object is created in the JVM heap but exists **outside** the Spring IoC container. As a result, it does not benefit from Spring's features—managing its dependencies, configuration, and lifecycle becomes your manual responsibility.
 
@@ -107,6 +109,27 @@ public class UserController {
     @Autowired
     private UserService userService; // Injected directly into the instance variable
 }
+```
+
+## XML-Based Spring Configuration
+
+While modern Spring Boot uses Java annotations and configuration classes, traditional Spring applications (or non-Boot projects) configure the IoC Container using XML.
+
+- **`spring.xml`**: The standard filename used for the XML configuration file containing bean definitions and wiring instructions.
+- **`<beans>`**: The root XML element encapsulating all bean declarations.
+- **`<bean>`**: The XML element defining a single bean, specifying its unique `id` and fully qualified `class`.
+
+_Example `spring.xml`:_
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dev" class="org.shubham.Dev" />
+</beans>
 ```
 
 ## History
@@ -214,6 +237,10 @@ Key components of a `pom.xml` file in a Spring Boot application include:
 - **Properties (`<properties>`)**: Defines configuration variables, such as the Java version (e.g., `<java.version>17</java.version>`).
 - **Dependencies (`<dependencies>`)**: Lists the libraries (e.g., `spring-boot-starter-web` for web APIs, `spring-boot-starter-test` for testing) that the project requires.
 - **Plugins (`<build><plugins>`)**: Configures build plugins, such as `spring-boot-maven-plugin` which repackages the application into an executable JAR.
+
+### Maven Archetype
+
+A **Maven Archetype** is a project templating toolkit. It provides a standardized blueprint/template to generate new Maven projects quickly with a predefined directory structure, dependencies, and configuration.
 
 ## Running Spring Boot Applications
 

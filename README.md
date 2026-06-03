@@ -6,19 +6,125 @@ Spring Boot is a Java framework that makes it easier to build production-ready S
 
 With Spring Boot, you can quickly create standalone web applications, REST APIs, microservices, and backend services that are easy to run and deploy.
 
-## IoC and DI
+## IoC, DI, and the IoC Container
 
-IoC stands for Inversion of Control. It means the framework controls how objects are created, connected, and managed instead of the developer manually creating every object with `new`.
+- **IoC (Inversion of Control)**: A design principle where the control of object creation and lifecycle management is transferred from the developer to the framework. Instead of manually instantiating classes with the `new` operator, the framework takes care of creating and managing them.
+- **DI (Dependency Injection)**: A pattern used to implement IoC. It is the process of supplying a resource (dependency) that a class needs. In Spring, dependencies are typically injected using Constructor Injection, Setter Injection, or Field Injection. Constructor injection is recommended because it ensures required dependencies are not null and supports immutability.
+- **IoC Container**: The core component of the Spring framework that implements IoC. It is responsible for instantiating, configuring, and assembling application objects (referred to as **Beans**) by reading configuration metadata (via Java annotations, code, or XML). In Spring Boot, the container is represented by the `ApplicationContext` interface.
 
-DI stands for Dependency Injection. It is a way to provide an object with the other objects it needs. In Spring, dependencies are usually injected through constructors, setter methods, or fields. Constructor injection is usually preferred because it makes required dependencies clear and helps with testing.
+For example, if you manually create an object using the `new` keyword (e.g., `MyService service = new MyService()`), that object is created in the JVM heap but exists **outside** the Spring IoC container. As a result, it does not benefit from Spring's features—managing its dependencies, configuration, and lifecycle becomes your manual responsibility.
 
-For example, instead of a service class creating its own repository object, Spring can create the repository and inject it into the service. This makes code easier to test, reuse, and maintain.
+This is precisely why Spring is used: the Spring IoC container takes over this responsibility, automatically creating and wiring the objects (beans) so you can focus on business logic. Instead of manually creating a service object, the container creates it and injects it into your controller, decoupling the classes and making the code easier to test, maintain, and reuse.
+
+### Spring Bean Lifecycle
+
+The Spring IoC container manages the complete lifecycle of a bean from its creation to its destruction. Understanding this lifecycle helps in executing custom logic at specific stages.
+
+The typical phases of a Spring Bean lifecycle are:
+
+1. **Instantiation**: The container finds the bean definition and instantiates the bean (creates the Java object).
+2. **Populate Properties**: The container injects the bean's dependencies (Dependency Injection).
+3. **Aware Interfaces**: If the bean implements any `*Aware` interfaces (e.g., `BeanNameAware`, `BeanFactoryAware`, `ApplicationContextAware`), the container passes the corresponding resources to the bean.
+4. **Bean Post-Processing (Before Initialization)**: The container executes `postProcessBeforeInitialization` methods of any registered `BeanPostProcessor` beans (this is where annotations like `@PostConstruct` are processed).
+5. **Initialization**:
+   - If the bean implements `InitializingBean`, its `afterPropertiesSet()` method is called.
+   - If a custom `init-method` is configured, it is called.
+6. **Bean Post-Processing (After Initialization)**: The container executes `postProcessAfterInitialization` methods of any registered `BeanPostProcessor` beans. At this stage, the bean is fully initialized and ready for use.
+7. **Destruction**: When the application context is closed (e.g., application shutdown):
+   - Methods annotated with `@PreDestroy` are called.
+   - If the bean implements `DisposableBean`, its `destroy()` method is called.
+   - If a custom `destroy-method` is configured, it is called.
+
+## Dependency Injection & Key Annotations
+
+### Key Annotations
+
+- **`@Component`**: Marks a class as a Spring-managed bean, meaning the IoC container will control its lifecycle and instantiation.
+  ```java
+  @Component
+  public class EmailService {}
+  ```
+- **`@Autowired`**: Instructs Spring to inject the required dependency automatically. By default, it resolves dependencies **by type**.
+  ```java
+  @Autowired
+  private EmailService emailService;
+  ```
+- **`@Primary`**: Prioritizes a bean when multiple beans of the same type exist.
+  ```java
+  @Component
+  @Primary
+  public class HighSpeedEmailService implements NotificationService {}
+  ```
+- **`@Qualifier`**: Used alongside `@Autowired` to specify the exact name of the bean to inject when multiple beans of the same type exist.
+  ```java
+  @Autowired
+  @Qualifier("slowEmailService")
+  private NotificationService service;
+  ```
+
+### Dependency Injection (DI) Styles
+
+There are three ways to inject dependencies into a class:
+
+#### 1. Constructor Injection (Recommended)
+
+Dependencies are provided through the constructor. It supports immutability (using `final` variables) and ensures the class cannot be created without its dependencies.
+
+```java
+@Component
+public class UserController {
+    private final UserService userService;
+
+    public UserController(UserService userService) { // @Autowired is optional here
+        this.userService = userService;
+    }
+}
+```
+
+#### 2. Setter Injection
+
+Dependencies are provided via setter methods. Good for optional or changeable dependencies.
+
+```java
+@Component
+public class UserController {
+    private UserService userService;
+
+    @Autowired
+    public void setUserService(UserService userService) {
+        this.userService = userService;
+    }
+}
+```
+
+#### 3. Field Injection (Instance Variable Injection)
+
+Dependencies are injected directly into instance variables/fields using reflection. Easy to write but discouraged because it makes testing harder and bypasses constructor validation.
+
+```java
+@Component
+public class UserController {
+    @Autowired
+    private UserService userService; // Injected directly into the instance variable
+}
+```
 
 ## History
 
 Spring Boot was created by the Spring team at Pivotal, with Phil Webb and Dave Syer commonly credited as co-creators. The first milestone release was announced on August 6, 2013, and Spring Boot 1.0 GA was released on April 1, 2014.
 
 It was created to make Spring application development faster and simpler by reducing manual configuration, improving project startup time, and making it easier to build standalone production-ready applications.
+
+## JVM (Java Virtual Machine)
+
+The Java Virtual Machine (JVM) is the engine that drives Java applications. It provides the runtime environment to execute Java bytecode. Because Spring Boot is a Java-based framework, its applications run on the JVM.
+
+Key concepts of the JVM in the context of Spring Boot:
+
+- **Platform Independence**: Java code compiles into platform-independent bytecode (`.class` files), which the JVM translates into machine code for the host operating system.
+- **Memory Management & Garbage Collection**: The JVM automatically manages memory allocation and deallocation (Garbage Collection) for Spring beans and other Java objects, helping to prevent memory leaks.
+- **Just-In-Time (JIT) Compiler**: The JVM compiles frequently executed bytecode into native machine code at runtime to optimize the performance of the Spring Boot application.
+- **JVM Tuning**: In production, developers configure JVM flags (e.g., `-Xms` for initial heap size and `-Xmx` for maximum heap size) to optimize the performance and memory footprint of the Spring Boot process.
 
 ## Key Features
 
@@ -96,6 +202,18 @@ Learn the basics of `.proto` files, gRPC services, unary calls, streaming, clien
 GraphQL is an API query language that lets clients ask for exactly the data they need. Unlike REST, where different endpoints often return fixed response structures, GraphQL usually uses a single endpoint and a schema that defines available data and operations.
 
 Spring Boot can be used with GraphQL to build flexible APIs for web and mobile applications. Learn schemas, queries, mutations, subscriptions, resolvers, input types, Spring for GraphQL, validation, security, and testing.
+
+## What is a POM File in Spring Boot?
+
+In Spring Boot projects built with Maven, the `pom.xml` (Project Object Model) file is the central configuration file located in the root directory. It contains configuration details used by Maven to build the project.
+
+Key components of a `pom.xml` file in a Spring Boot application include:
+
+- **Project Metadata**: Basic info such as `groupId` (group/org ID), `artifactId` (project name), and `version`.
+- **Parent POM (`<parent>`)**: Typically inherits from `spring-boot-starter-parent` to provide default configurations and version management for starter dependencies.
+- **Properties (`<properties>`)**: Defines configuration variables, such as the Java version (e.g., `<java.version>17</java.version>`).
+- **Dependencies (`<dependencies>`)**: Lists the libraries (e.g., `spring-boot-starter-web` for web APIs, `spring-boot-starter-test` for testing) that the project requires.
+- **Plugins (`<build><plugins>`)**: Configures build plugins, such as `spring-boot-maven-plugin` which repackages the application into an executable JAR.
 
 ## Running Spring Boot Applications
 

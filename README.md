@@ -157,60 +157,191 @@ Key concepts of the JVM in the context of Spring Boot:
 - Production-ready tools like health checks, metrics, and externalized configuration
 - Simple application startup using a standard `main` method
 
+## Spring Web and Spring MVC
+
+### Spring Web
+
+**Spring Web** (`spring-web`) provides the core web integration features of the Spring Framework, serving as the foundation for web application development.
+
+- **Web Integration**: Contains basic web-oriented integration features like multipart file upload, HTTP client utilities (`RestTemplate`, `WebClient`), and serialization/deserialization helpers.
+- **Application Context**: Extends the core Spring IoC container with a web-aware application context (`WebApplicationContext`).
+- **Servlet Integration**: Defines servlet listeners and filters needed to initialize Spring contexts in standard servlet containers.
+
+### Spring MVC (Model-View-Controller)
+
+**Spring MVC** (`spring-webmvc`) is a servlet-based web framework built on the Model-View-Controller design pattern. It uses the DispatcherServlet to orchestrate the lifecycle of incoming web requests.
+
+Key architectural components include:
+
+- **`DispatcherServlet` (Front Controller)**: The central dispatcher that receives all HTTP requests, processes them, and routes them to the appropriate controllers.
+- **`HandlerMapping`**: Maps incoming HTTP requests to specific handler methods in `@Controller` or `@RestController` beans.
+- **`HandlerAdapter`**: Executes the handler method found by `HandlerMapping`.
+- **Controllers**: Contain request-handling logic, process user inputs, and return view names or data directly.
+- **`ViewResolver`**: Resolves logical view names (e.g., `"home"`) returned by controllers to actual rendering technologies (e.g., JSP, Thymeleaf templates).
+- **`ModelAndView` / Model**: Carries model data to be rendered by the View. For REST APIs, this step is bypassed using `@ResponseBody`, returning serialized JSON/XML data directly.
+
+#### Spring MVC Request Lifecycle Flow:
+
+```text
+Client Request
+      │
+      ▼
+┌────────────────────────────────────────────────────────────────┐
+│                   DispatcherServlet (Front Controller)          │
+└────────┬─────────────────────────▲────────────────────┬────────┘
+         │ 1. Get Handler          │ 4. Return View     │ 6. Send
+         ▼                         │    Name & Model    │    Response
+┌─────────────────┐       ┌────────┴────────┐           ▼
+│ HandlerMapping  │       │   Controller    │      ┌──────────┐
+└─────────────────┘       └────────▲────────┘      │  Client  │
+                           2. Dispatch Request     └──────────┘
+                           3. Execute Handler
+```
+
+1. **Client Request**: The client sends an HTTP request (e.g., `GET /users`).
+2. **Front Controller Dispatch**: The `DispatcherServlet` intercepts the request and asks `HandlerMapping` to locate the appropriate controller.
+3. **Execution**: The `DispatcherServlet` invokes the controller method (via the handler adapter).
+4. **Business & Data Processing**: The controller processes input parameters, calls the service layer to perform business logic, and prepares the response.
+5. **Response Resolution**:
+   - **For Web Pages (MVC)**: The controller returns a logical view name and model data. `DispatcherServlet` resolves the view using a `ViewResolver`, renders it with model data, and returns HTML.
+   - **For REST APIs (Spring Web)**: The controller is annotated with `@RestController` (or `@ResponseBody`). The response object is serialized directly to JSON/XML using message converters (like Jackson) and written straight to the HTTP response body.
+
+---
+
 ## Common Spring Boot Layers
 
-Most Spring Boot backend applications are organized into layers. Each layer has a clear responsibility.
+Most Spring Boot backend applications are organized into a layered architecture to achieve **Separation of Concerns**. Each layer has a clear, isolated responsibility.
 
-### Controller
+### 1. Presentation Layer (Controller)
 
-The controller handles incoming HTTP requests from the client. It receives request data, calls the service layer, and returns a response.
+The controller handles incoming HTTP requests from the client. It receives request data (path variables, request parameters, request body), validates inputs (often using `@Valid`), calls the service layer, and returns the appropriate HTTP status code and response body.
 
 Common annotations:
 
-- `@RestController`
-- `@RequestMapping`
-- `@GetMapping`
-- `@PostMapping`
-- `@PutMapping`
-- `@DeleteMapping`
+- `@RestController`: Marks the class as a REST controller where methods return JSON/XML responses directly.
+- `@Controller`: Marks the class as a traditional web MVC controller returning views.
+- `@RequestMapping`, `@GetMapping`, `@PostMapping`, `@PutMapping`, `@DeleteMapping`: Map specific HTTP request methods and paths to Java methods.
 
-### Service
+### 2. Business Logic Layer (Service)
 
-The service layer contains business logic. It decides what the application should do, validates rules, and coordinates work between controllers and repositories.
+The service layer contains the business rules and logic of the application. It acts as a bridge between the Controller and the Repository. It handles transaction management (using `@Transactional`), performs validations, coordinates business processes, and maps data between layers.
 
 Common annotation:
 
-- `@Service`
+- `@Service`: Registers the class as a service bean in the IoC container.
 
-### Repository
+### 3. Data Access Layer (Repository / DAO)
 
-The repository layer handles database operations. It is used to save, read, update, and delete data.
+The repository layer handles database operations and queries. It abstracts the underlying SQL/NoSQL operations, providing clean methods to save, retrieve, update, and delete objects.
 
-Common annotations and interfaces:
+Common annotations/interfaces:
 
-- `@Repository`
-- `JpaRepository`
-- `CrudRepository`
+- `@Repository`: Registers the class as a repository bean and translates database exceptions into Spring's DataAccessException hierarchy.
+- `JpaRepository` / `CrudRepository`: Interfaces provided by Spring Data to gain CRUD and paging operations out-of-the-box.
 
-### Entity
+### 4. Database Layer (Entity)
 
-An entity represents a database table in Java code. Each object of an entity class usually represents one row in the table.
+An entity represents a database table structure as a Java class (using Java Persistence API / JPA). Each instance of an entity class represents a row in the database table.
 
 Common annotations:
 
-- `@Entity`
-- `@Id`
-- `@GeneratedValue`
+- `@Entity`: Defines that the class is mapped to a database table.
+- `@Id`: Specifies the primary key of the entity.
+- `@GeneratedValue`: Defines the primary key generation strategy (e.g., Auto, Identity).
 
-### DTO
+### 5. DTO (Data Transfer Object) & Mapper Layer
 
-DTO stands for Data Transfer Object. It is used to send only the required data between layers or between the backend and frontend.
+- **DTO**: Used to send only the required data between the client and the server or between layers. It prevents exposing internal database structures (Entities) directly to the API client.
+- **Mapper**: Used to convert Entities to DTOs and vice-versa, keeping the conversion logic isolated from the service and controller layers.
 
-### Basic Flow
+### 6. Exception Handling Layer
+
+A cross-cutting layer used to handle application-wide exceptions globally, formatting clean and standard error responses for clients.
+
+Common annotations:
+
+- `@ControllerAdvice` / `@RestControllerAdvice`: Intercepts exceptions thrown by controllers globally.
+- `@ExceptionHandler`: Defines methods to handle specific exceptions.
+
+### Basic Request Flow:
 
 ```text
-Client -> Controller -> Service -> Repository -> Database
+Client  ──►  Controller  ──►  Service  ──►  Repository  ──►  Database
+  ▲               │              │              │               │
+  │               ▼              ▼              ▼               ▼
+Response ◄─── (DTOs) ◄────── (Entities) ◄──── (Rows) ◄──────────┘
 ```
+
+---
+
+## Spring Data JPA and H2 Database
+
+### Spring Data JPA
+
+**Spring Data JPA** is part of the larger Spring Data family that makes it easy to implement JPA (Java Persistence API) based repositories. It reduces the boilerplate code required to implement data access layers.
+
+- **ORM (Object-Relational Mapping)**: It allows Java developers to map Java objects (Entities) to relational database tables and vice-versa, avoiding manual SQL queries.
+- **Hibernate**: Spring Data JPA uses **Hibernate** by default as its primary JPA Provider (implementation of the JPA specification).
+
+### JPA Repository (`JpaRepository`)
+
+`JpaRepository` is a Spring Data JPA interface that extends `PagingAndSortingRepository` and `CrudRepository`. By extending `JpaRepository`, your repository inherits standard CRUD (Create, Read, Update, Delete) methods without writing any implementation code.
+
+#### Inherited Features:
+
+1. **Out-of-the-box CRUD**: Standard operations like `.save()`, `.findById()`, `.findAll()`, `.deleteById()`, and `.count()`.
+2. **Paging and Sorting**: Fetching data in chunks and sorting by specified fields (e.g., `.findAll(Pageable pageable)`).
+3. **Derived Query Methods**: Generating queries automatically based on method names.
+
+   ```java
+   public interface UserRepository extends JpaRepository<User, Long> {
+       // Translates to: SELECT * FROM users WHERE email = ?
+       Optional<User> findByEmail(String email);
+
+       // Translates to: SELECT * FROM users WHERE first_name = ? AND last_name = ?
+       List<User> findByFirstNameAndLastName(String firstName, String lastName);
+   }
+   ```
+
+4. **Custom Queries**: Using `@Query` to write custom JPQL (Java Persistence Query Language) or native SQL queries.
+
+   ```java
+   @Query("SELECT u FROM User u WHERE u.status = :status")
+   List<User> findUsersByStatus(@Param("status") String status);
+
+   @Query(value = "SELECT * FROM users WHERE registration_date > :date", nativeQuery = true)
+   List<User> findNewUsers(@Param("date") LocalDate date);
+   ```
+
+### H2 Database
+
+**H2** is a lightweight, open-source relational database written in Java. It can be run in **Embedded Mode** (stored in memory or a local file) or **Server Mode**.
+
+- **In-Memory Mode**: The database is created in the JVM's memory when the application starts, and is completely destroyed when the application stops. This makes it ideal for local development, rapid prototyping, and running unit tests.
+- **H2 Console**: H2 provides a built-in web-based console to inspect and query database tables.
+
+#### Common H2 Configuration (`application.properties`):
+
+```properties
+# Enable H2 Console
+spring.h2.console.enabled=true
+spring.h2.console.path=/h2-console
+
+# Database Connection URL (In-Memory)
+spring.datasource.url=jdbc:h2:mem:testdb
+spring.datasource.driverClassName=org.h2.Driver
+spring.datasource.username=sa
+spring.datasource.password=password
+
+# Hibernate DDL Auto (creates/updates schema automatically based on @Entity classes)
+spring.jpa.hibernate.ddl-auto=update
+```
+
+#### Accessing H2 Console:
+
+Once the application is running, navigate to `http://localhost:8080/h2-console` in your browser. Make sure the JDBC URL matches the configured one (e.g., `jdbc:h2:mem:testdb`) to connect to the active in-memory database.
+
+---
 
 ## gRPC in Spring Boot
 

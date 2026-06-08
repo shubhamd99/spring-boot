@@ -4,7 +4,21 @@
         http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
     <!-- bean definitions here -->
-    <bean id="dev" class="org.shubham.Dev">
+    <bean id="dev" class="org.shubham.Dev" autowire="byName">
+        <!--  <property name="age" value="12" />-->
+        <!--  <property name="comp" ref="laptop" />-->
+        <!-- <constructor-arg value="14" />-->
+    </bean>
 
+    <bean id="dev1" class="org.shubham.Dev">
+        <!-- <property name="age" value="14" />-->
+        <!-- <property name="comp" ref="desktop" />-->
+        <!-- <constructor-arg value="14" />-->
+    </bean>
+
+    <bean id="laptop" class="org.shubham.Laptop">
+    </bean>
+
+    <bean id="desktop" class="org.shubham.Desktop">
     </bean>
 </beans>

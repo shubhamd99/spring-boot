@@ -1,12 +1,12 @@
 package org.shubham;
 
-public class Laptop {
+public class Laptop implements Computer {
     // constructor
     public Laptop() {
         System.out.println("Laptop constructor");
     }
 
-    public void build() {
-        System.out.println("working on Awesome !!");
+    public void compile() {
+        System.out.println("Compiling in laptop");
     }
 }

@@ -1,5 +1,7 @@
 # E-Commerce Spring Boot Application (Learning Project)
 
+<img src="start.spring.io.png" width="800" alt="Spring Initializr Configuration">
+
 This project is a fully functional E-Commerce backend built using **Spring Boot**. It is designed to serve as a comprehensive learning resource for understanding Spring Boot's core concepts, including building REST APIs, managing database transactions with Spring Data JPA, handling file uploads, and writing custom queries.
 
 ## Table of Contents

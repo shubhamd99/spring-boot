@@ -6,6 +6,14 @@ Spring Boot is a Java framework that makes it easier to build production-ready S
 
 With Spring Boot, you can quickly create standalone web applications, REST APIs, microservices, and backend services that are easy to run and deploy.
 
+## Projects in this Workspace
+
+This repository contains several sample projects to demonstrate Spring and Spring Boot concepts:
+- **[DemoSpringWithoutBoot](./DemoSpringWithoutBoot/)**: A demonstration of core Spring concepts (IoC, DI) without the auto-configuration magic of Spring Boot.
+- **[myApp](./myApp/)**: A basic introductory Spring Boot application.
+- **[ecom-proj](./ecom-proj/)**: A comprehensive E-Commerce REST API demonstrating CRUD operations, Spring Data JPA, H2 database integration, and file handling.
+
+
 ## IoC, DI, and the IoC Container
 
 - **IoC (Inversion of Control)**: A design principle where the control of object creation and lifecycle management is transferred from the developer to the framework. Instead of manually instantiating classes with the `new` operator, the framework takes care of creating and managing them.
@@ -62,6 +70,11 @@ The typical phases of a Spring Bean lifecycle are:
   @Autowired
   @Qualifier("slowEmailService")
   private NotificationService service;
+  ```
+- **`@Value`**: Injects values from properties files (`application.properties` or `application.yml`) directly into variables.
+  ```java
+  @Value("${app.max-users:100}")
+  private int maxUsers;
   ```
 
 ### Dependency Injection (DI) Styles
@@ -132,6 +145,24 @@ _Example `spring.xml`:_
 </beans>
 ```
 
+## Java-Based Configuration
+
+In modern Spring Boot applications, Java-based configuration is preferred over XML. This is done using `@Configuration` and `@Bean`.
+
+- **`@Configuration`**: Marks a class as a source of bean definitions. It tells Spring that this class contains methods that will instantiate and configure beans.
+- **`@Bean`**: Used on methods within a `@Configuration` class. It tells Spring that the method returns an object that should be registered as a bean in the Spring application context.
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(); // The returned object is managed by Spring
+    }
+}
+```
+
 ## History
 
 Spring Boot was created by the Spring team at Pivotal, with Phil Webb and Dave Syer commonly credited as co-creators. The first milestone release was announced on August 6, 2013, and Spring Boot 1.0 GA was released on April 1, 2014.
@@ -156,6 +187,21 @@ Key concepts of the JVM in the context of Spring Boot:
 - Starter dependencies for web, data, security, testing, and more
 - Production-ready tools like health checks, metrics, and externalized configuration
 - Simple application startup using a standard `main` method
+- **Spring Boot Actuator**: Provides built-in production-ready REST endpoints (like `/actuator/health` and `/actuator/metrics`) to monitor and manage your application's health, metrics, environment, and configuration without having to write code for it.
+
+## Other Essential Concepts & Tools
+
+### AOP (Aspect-Oriented Programming)
+AOP is a programming paradigm used to modularize cross-cutting concerns—functions that span multiple points of an application, such as logging, security, or transaction management. Instead of duplicating logging code in every service method, you write an **Aspect** that automatically intercepts method calls and applies the logging logic.
+
+### Lombok
+Project Lombok is a popular Java library that automatically plugs into your editor and build tools to reduce boilerplate code. Using annotations like `@Data`, `@Getter`, `@Setter`, `@NoArgsConstructor`, and `@AllArgsConstructor`, it generates getters, setters, constructors, and `toString()` methods at compile time.
+
+### Spring Security
+Spring Security is a powerful and customizable authentication and access-control framework. It is the de-facto standard for securing Spring-based applications.
+- **Authentication**: Verifies who the user is (e.g., checking username and password).
+- **Authorization**: Verifies what the user is allowed to do (e.g., checking if the user has an `ADMIN` role).
+- It operates using a chain of **Security Filters** that intercept incoming requests to enforce security rules before the request ever reaches your Controller.
 
 ## Spring Web and Spring MVC
 

@@ -1,5 +1,8 @@
 # Service Registry (Netflix Eureka Server)
 
+<img src="start.spring.io.png" width="800">
+<img src="images/01.png" width="800">
+
 This project serves as a **Service Discovery Registry** in a microservices architecture.
 
 ---

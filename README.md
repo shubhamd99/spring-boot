@@ -9,10 +9,11 @@ With Spring Boot, you can quickly create standalone web applications, REST APIs,
 ## Projects in this Workspace
 
 This repository contains several sample projects to demonstrate Spring and Spring Boot concepts:
+
 - **[DemoSpringWithoutBoot](./DemoSpringWithoutBoot/)**: A demonstration of core Spring concepts (IoC, DI) without the auto-configuration magic of Spring Boot.
 - **[myApp](./myApp/)**: A basic introductory Spring Boot application.
 - **[ecom-proj](./ecom-proj/)**: A comprehensive E-Commerce REST API demonstrating CRUD operations, Spring Data JPA, H2 database integration, and file handling.
-
+- **[service-registry](./service-registry/)**: A demonstration of Netflix Eureka Server acting as a Service Discovery Registry for microservices.
 
 ## IoC, DI, and the IoC Container
 
@@ -192,16 +193,27 @@ Key concepts of the JVM in the context of Spring Boot:
 ## Other Essential Concepts & Tools
 
 ### AOP (Aspect-Oriented Programming)
+
 AOP is a programming paradigm used to modularize cross-cutting concerns—functions that span multiple points of an application, such as logging, security, or transaction management. Instead of duplicating logging code in every service method, you write an **Aspect** that automatically intercepts method calls and applies the logging logic.
 
 ### Lombok
+
 Project Lombok is a popular Java library that automatically plugs into your editor and build tools to reduce boilerplate code. Using annotations like `@Data`, `@Getter`, `@Setter`, `@NoArgsConstructor`, and `@AllArgsConstructor`, it generates getters, setters, constructors, and `toString()` methods at compile time.
 
 ### Spring Security
+
 Spring Security is a powerful and customizable authentication and access-control framework. It is the de-facto standard for securing Spring-based applications.
+
 - **Authentication**: Verifies who the user is (e.g., checking username and password).
 - **Authorization**: Verifies what the user is allowed to do (e.g., checking if the user has an `ADMIN` role).
 - It operates using a chain of **Security Filters** that intercept incoming requests to enforce security rules before the request ever reaches your Controller.
+
+### Service Discovery & Eureka
+
+In a microservices architecture, dozens of independent services need to communicate with one another. Instead of hardcoding IP addresses and ports, they use **Service Discovery**.
+
+- A **Service Registry** acts as a "phone book" where all microservices register themselves on startup.
+- **Eureka** (built by Netflix and integrated via Spring Cloud) is one of the most popular service registries. It consists of a **Eureka Server** (the phone book) and **Eureka Clients** (the microservices that register themselves and look up other services).
 
 ## Spring Web and Spring MVC
 

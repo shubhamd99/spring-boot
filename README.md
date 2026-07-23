@@ -198,7 +198,34 @@ AOP is a programming paradigm used to modularize cross-cutting concerns—functi
 
 ### Lombok
 
-Project Lombok is a popular Java library that automatically plugs into your editor and build tools to reduce boilerplate code. Using annotations like `@Data`, `@Getter`, `@Setter`, `@NoArgsConstructor`, and `@AllArgsConstructor`, it generates getters, setters, constructors, and `toString()` methods at compile time.
+Project Lombok is a popular Java library that automatically plugs into your editor and build tools to drastically reduce boilerplate code. 
+
+**Why is it used?**
+In standard Java, creating a simple Data class (like a User or Product) requires writing dozens of lines of repetitive code: Getters, Setters, Constructors, `equals()`, `hashCode()`, and `toString()`. Lombok generates all of this automatically at compile time using simple annotations.
+
+**Without Lombok:**
+```java
+public class User {
+    private String name;
+    
+    public User() {}
+    public User(String name) { this.name = name; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
+    // ... equals, hashCode, toString
+}
+```
+
+**With Lombok:**
+```java
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class User {
+    private String name;
+}
+```
+Using annotations like `@Data` (which combines getters, setters, toString, equals, and hashCode), `@Getter`, `@Setter`, `@NoArgsConstructor`, and `@AllArgsConstructor`, you keep your codebase incredibly clean and readable.
 
 ### Spring Security
 

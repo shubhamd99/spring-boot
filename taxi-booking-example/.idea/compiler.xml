@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
       <profile name="Annotation profile for taxi-booking-example" enabled="true">
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
@@ -10,6 +11,7 @@
           <entry name="$MAVEN_REPOSITORY$/org/projectlombok/lombok/1.18.46/lombok-1.18.46.jar" />
         </processorPath>
         <module name="cab-service" />
+        <module name="common-dtos" />
         <module name="driver-service" />
       </profile>
     </annotationProcessing>
@@ -17,6 +19,7 @@
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
       <module name="cab-service" options="-parameters" />
+      <module name="common-dtos" options="-parameters" />
       <module name="driver-service" options="-parameters" />
       <module name="taxi-booking-example" options="-parameters" />
     </option>

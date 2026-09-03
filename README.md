@@ -299,53 +299,116 @@ Most Spring Boot backend applications are organized into a layered architecture 
 
 ### 1. Presentation Layer (Controller)
 
-The controller handles incoming HTTP requests from the client. It receives request data (path variables, request parameters, request body), validates inputs (often using `@Valid`), calls the service layer, and returns the appropriate HTTP status code and response body.
+The controller handles incoming HTTP requests from the client. It receives request data (path variables, request parameters, request body), validates inputs, calls the service layer, and returns the response.
 
 Common annotations:
-
 - `@RestController`: Marks the class as a REST controller where methods return JSON/XML responses directly.
-- `@Controller`: Marks the class as a traditional web MVC controller returning views.
-- `@RequestMapping`, `@GetMapping`, `@PostMapping`, `@PutMapping`, `@DeleteMapping`: Map specific HTTP request methods and paths to Java methods.
+- `@RequestMapping`, `@GetMapping`, `@PostMapping`: Map specific HTTP request methods and paths to Java methods.
+
+**Example Syntax**:
+```java
+@RestController
+@RequestMapping("/api/users")
+public class UserController {
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
+
+    @GetMapping("/{id}")
+    public UserDTO getUser(@PathVariable Long id) {
+        return userService.getUserById(id);
+    }
+}
+```
 
 ### 2. Business Logic Layer (Service)
 
-The service layer contains the business rules and logic of the application. It acts as a bridge between the Controller and the Repository. It handles transaction management (using `@Transactional`), performs validations, coordinates business processes, and maps data between layers.
+The service layer contains the business rules and logic of the application. It handles transaction management, performs validations, and coordinates business processes.
 
 Common annotation:
-
 - `@Service`: Registers the class as a service bean in the IoC container.
+
+**Example Syntax**:
+```java
+@Service
+public class UserService {
+    private final UserRepository userRepository;
+
+    public UserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
+    @Transactional
+    public UserDTO getUserById(Long id) {
+        User user = userRepository.findById(id).orElseThrow();
+        // Map the Entity to a DTO before returning
+        return new UserDTO(user.getName(), user.getEmail());
+    }
+}
+```
 
 ### 3. Data Access Layer (Repository / DAO)
 
-The repository layer handles database operations and queries. It abstracts the underlying SQL/NoSQL operations, providing clean methods to save, retrieve, update, and delete objects.
+The repository layer handles database operations and queries, abstracting the underlying SQL/NoSQL operations.
 
 Common annotations/interfaces:
-
-- `@Repository`: Registers the class as a repository bean and translates database exceptions into Spring's DataAccessException hierarchy.
-- `JpaRepository` / `CrudRepository`: Interfaces provided by Spring Data to gain CRUD and paging operations out-of-the-box.
+- `@Repository`: Registers the class as a repository bean.
+- `JpaRepository`: Interface provided by Spring Data for out-of-the-box CRUD operations.
 
 ### 4. Database Layer (Entity)
 
-An entity represents a database table structure as a Java class (using Java Persistence API / JPA). Each instance of an entity class represents a row in the database table.
+An entity represents a database table structure as a Java class using JPA.
 
 Common annotations:
-
 - `@Entity`: Defines that the class is mapped to a database table.
 - `@Id`: Specifies the primary key of the entity.
-- `@GeneratedValue`: Defines the primary key generation strategy (e.g., Auto, Identity).
+
+**Example Syntax**:
+```java
+@Entity
+@Table(name = "users")
+public class User {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    
+    private String name;
+    private String email;
+    private String password; // Sensitive data, should not be returned to client
+    
+    // Getters and Setters...
+}
+```
 
 ### 5. DTO (Data Transfer Object) & Mapper Layer
 
-- **DTO**: Used to send only the required data between the client and the server or between layers. It prevents exposing internal database structures (Entities) directly to the API client.
-- **Mapper**: Used to convert Entities to DTOs and vice-versa, keeping the conversion logic isolated from the service and controller layers.
+- **DTO**: Used to send only the required/safe data between the client and the server. It prevents exposing internal database structures (like passwords in Entities) directly to the API client.
+- **Mapper**: Used to convert Entities to DTOs and vice-versa.
+
+**Example Syntax**:
+```java
+// A simple DTO exposing only safe fields to the client
+public class UserDTO {
+    private String name;
+    private String email;
+    
+    public UserDTO(String name, String email) {
+        this.name = name;
+        this.email = email;
+    }
+    // Getters and Setters...
+}
+```
+*(Note: In modern Java, `record UserDTO(String name, String email) {}` is often used for concise DTOs).*
 
 ### 6. Exception Handling Layer
 
 A cross-cutting layer used to handle application-wide exceptions globally, formatting clean and standard error responses for clients.
 
 Common annotations:
-
-- `@ControllerAdvice` / `@RestControllerAdvice`: Intercepts exceptions thrown by controllers globally.
+- `@RestControllerAdvice`: Intercepts exceptions thrown by controllers globally.
 - `@ExceptionHandler`: Defines methods to handle specific exceptions.
 
 ### Basic Request Flow:
